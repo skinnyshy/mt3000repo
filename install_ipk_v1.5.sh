@@ -1,6 +1,15 @@
 #!/bin/sh
 # author: skinnyshy
 # 脚本说明：用于每次升级版本之后安装常用软件，包括：openclash、Glinjector、argon主题、istore等
+
+# 执行一次更新操作
+opkg_update_once() {
+    if [ -z "$OPKG_UPDATED" ]; then
+        opkg update
+        OPKG_UPDATED=1
+    fi
+}
+
 ChangeMirror(){
 	cp  /etc/opkg/distfeeds.conf  /etc/opkg/distfeeds.conf-$(date +%Y-%m-%d) || exit 1
 	cat> /etc/opkg/distfeeds.conf << EOF
@@ -22,7 +31,7 @@ OpClashInstall() {
 	# 判断当前是否为nftables
 	if [ "$(readlink /usr/sbin/iptables)" = "/usr/sbin/xtables-nft-multi" ]; then 
 		# openwrt23之后默认使用nftables使用下面的命令进行安装,默认使用opkg管理器
-		opkg update
+		opkg_update_once
 		opkg install bash dnsmasq-full curl ca-bundle ip-full ruby ruby-yaml kmod-tun kmod-inet-diag unzip kmod-nft-tproxy luci-compat luci luci-base || {
 		    echo "错误: 依赖包安装失败"
 		    exit 2
@@ -30,7 +39,7 @@ OpClashInstall() {
 		opkg install /tmp/openclash.ipk
 
 	else 
-		opkg update
+		opkg_update_once
 		opkg install bash iptables dnsmasq-full curl ca-bundle ipset ip-full iptables-mod-tproxy iptables-mod-extra ruby ruby-yaml kmod-tun kmod-inet-diag unzip luci-compat luci luci-base || {
 		    echo "错误: 依赖包安装失败"
 		    exit 2
@@ -43,26 +52,26 @@ OpClashInstall() {
 GlinjectorIns() {
 	mkdir -p /tmp/glinjector || exit 3
 	cd /tmp/glinjector || exit 3
-	wget --no-check-certificate  -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip
+	wget --no-check-certificate  -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.5-6_all.zip || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.5-6_all.zip
 	unzip glinjector.zip || exit 3
-	opkg update || exit 3
+	opkg_update_once
 	opkg install *.ipk 
 }
 
 ArgonInstall() {
-	opkg update || exit 4
+	opkg_update_once
 	opkg install luci-compat luci-lib-ipkg || {
 		    echo "错误: 依赖包安装失败"
 		    exit 4
 		}
 	mkdir -p /tmp/argon || exit 4
 	cd /tmp/argon || exit 4
-	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk
+	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk
 	opkg install luci-theme-argon*.ipk
 }
 
 IstoreInstall() {
-	opkg update || exit 5
+	opkg_update_once
 	cd /tmp
 	wget https://gh-proxy.org/https://github.com/linkease/openwrt-app-actions/raw/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run || exit 5
 	chmod 755 istore-reinstall.run
@@ -72,14 +81,18 @@ IstoreInstall() {
 EasytierIns() {
 	mkdir -p /tmp/easytier || exit 5
 	cd /tmp/easytier
-	wget --no-check-certificate -O easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip || curl -k -o easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk
+	wget --no-check-certificate -O easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip || curl -k -o easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip
 	unzip easytier.zip
-	opkg update || exit 5
+	opkg_update_once
 	opkg install ./*.ipk || exit 5
 
 }
 Cleanup() {
-    rm -rf /tmp/openclash /tmp/glinjector /tmp/argon /tmp/easytier
+    # 检查目录存在后删除，避免错误信息
+    [ -d /tmp/openclash ] && rm -rf /tmp/openclash
+    [ -d /tmp/glinjector ] && rm -rf /tmp/glinjector
+    [ -d /tmp/argon ] && rm -rf /tmp/argon
+    [ -d /tmp/easytier ] && rm -rf /tmp/easytier
 }
 main() {
 	if [ $(opkg list-installed | grep -i glinjector | wc -l) -ge 1 ]; then
