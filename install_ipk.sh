@@ -1,5 +1,6 @@
 #!/bin/sh
-
+# author: skinnyshy
+# 脚本说明：用于每次升级版本之后安装常用软件，包括：openclash、Glinjector、argon主题、istore等
 ChangeMirror(){
 	cp  /etc/opkg/distfeeds.conf  /etc/opkg/distfeeds.conf-$(date +%Y-%m-%d) || exit 1
 	cat> /etc/opkg/distfeeds.conf << EOF
