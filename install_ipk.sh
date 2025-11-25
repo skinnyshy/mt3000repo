@@ -68,6 +68,14 @@ IstoreInstall() {
 	chmod 755 istore-reinstall.run
 	./istore-reinstall.run
 }
+
+EasytierIns() {
+	mkdir -p /tmp/easytier || exit 5
+	cd /tmp/easytier
+	
+	opkg update || exit 5
+
+}
 Cleanup() {
     rm -rf /tmp/openclash /tmp/glinjector /tmp/argon
 }
