@@ -44,10 +44,12 @@ GlinjectorIns() {
 	cd /tmp/glinjector || exit 3
 	wget --no-check-certificate  -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip
 	unzip glinjector.zip || exit 3
+	opkg update || exit 3
 	opkg install *.ipk 
 }
 
 ArgonInstall() {
+	opkg update || exit 4
 	opkg install luci-compat luci-lib-ipkg || {
 		    echo "错误: 依赖包安装失败"
 		    exit 4
@@ -58,6 +60,13 @@ ArgonInstall() {
 	opkg install luci-theme-argon*.ipk
 }
 
+IstoreInstall() {
+	opkg update || exit 5
+	cd /tmp
+	wget https://gh-proxy.org/https://github.com/linkease/openwrt-app-actions/raw/main/applications/luci-app-systools/root/usr/share/systools/istore-reinstall.run || exit 5
+	chmod 755 istore-reinstall.run
+	./istore-reinstall.run
+}
 Cleanup() {
     rm -rf /tmp/openclash /tmp/glinjector /tmp/argon
 }
