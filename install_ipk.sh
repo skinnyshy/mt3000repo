@@ -86,6 +86,13 @@ main() {
 	else
 		ArgonInstall
 	fi
+	if [ $(opkg list-installed | grep -i app-store | wc -l) = 1 ]; then
+		echo "istore already installed!!"
+	else
+		IstoreInstall
+	fi
 	Cleanup
 	
 }
+
+main
