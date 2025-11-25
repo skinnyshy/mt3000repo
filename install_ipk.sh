@@ -72,34 +72,41 @@ IstoreInstall() {
 EasytierIns() {
 	mkdir -p /tmp/easytier || exit 5
 	cd /tmp/easytier
-	
+	wget --no-check-certificate -O easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip || curl -k -o easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk
+	unzip easytier.zip
 	opkg update || exit 5
+	opkg install ./*.ipk || exit 5
 
 }
 Cleanup() {
-    rm -rf /tmp/openclash /tmp/glinjector /tmp/argon
+    rm -rf /tmp/openclash /tmp/glinjector /tmp/argon /tmp/easytier
 }
 main() {
-	if [ $(opkg list-installed | grep -i glinjector | wc -l) = 1 ]; then
+	if [ $(opkg list-installed | grep -i glinjector | wc -l) -ge 1 ]; then
 		echo "glinjector already installed!!"
 	else
 		GlinjectorIns
 	fi
-	if [ $(opkg list-installed | grep -i openclash | wc -l) = 1 ]; then
+	if [ $(opkg list-installed | grep -i openclash | wc -l) -ge 1 ]; then
 		echo "openclash already installed!!"
 	else
 		OpClashInstall
 	fi
-	if [ $(opkg list-installed | grep -i luci-theme-argon | wc -l) = 1 ]; then
+	if [ $(opkg list-installed | grep -i luci-theme-argon | wc -l) -ge 1 ]; then
 		echo "argontheme already installed!!"
 	else
 		ArgonInstall
 	fi
-	if [ $(opkg list-installed | grep -i app-store | wc -l) = 1 ]; then
+	if [ $(opkg list-installed | grep -i app-store | wc -l) -ge 1 ]; then
 		echo "istore already installed!!"
 	else
 		IstoreInstall
 	fi
+	if [ $(opkg list-installed | grep -i easytier | wc -l) -ge 1 ]; then
+		echo "istore already installed!!"
+	else
+		EasytierIns
+	fi	
 	Cleanup
 	
 }
