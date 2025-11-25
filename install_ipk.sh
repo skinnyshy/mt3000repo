@@ -17,7 +17,7 @@ OpClashInstall() {
 	mkdir -p /tmp/openclash || exit 2
 	cd /tmp/openclash || exit 2
 	# 使用wget下载经过加速的0.47.028版本的
-	wget -O openclash.ipk https://gh-proxy.org/https://github.com/vernesong/OpenClash/releases/download/v0.47.028/luci-app-openclash_0.47.028_all.ipk || curl -o openclash.ipk https://gh-proxy.org/https://github.com/vernesong/OpenClash/releases/download/v0.47.028/luci-app-openclash_0.47.028_all.ipk
+	wget --no-check-certificate  -O openclash.ipk https://gh-proxy.org/https://github.com/vernesong/OpenClash/releases/download/v0.47.028/luci-app-openclash_0.47.028_all.ipk || curl -k -o openclash.ipk https://gh-proxy.org/https://github.com/vernesong/OpenClash/releases/download/v0.47.028/luci-app-openclash_0.47.028_all.ipk
 	# 判断当前是否为nftables
 	if [ "$(readlink /usr/sbin/iptables)" = "/usr/sbin/xtables-nft-multi" ]; then 
 		# openwrt23之后默认使用nftables使用下面的命令进行安装,默认使用opkg管理器
@@ -36,7 +36,34 @@ OpClashInstall() {
 GlinjectorIns() {
 	mkdir -p /tmp/glinjector || exit 3
 	cd /tmp/glinjector || exit 3
-	wget -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip || curl -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip
+	wget --no-check-certificate  -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/blob/main/glinjector/glinjector_3.0.5-6_all.zip
 	unzip glinjector.zip || exit 3
 	opkg install ./*.ipk || exit 3
+}
+
+ArgonInstall() {
+	opkg install luci-compat
+	opkg install luci-lib-ipkg
+	mkdir -p /tmp/argon || exit 4
+	cd /tmp/argon || exit 4
+	wget --no-check-certificate -O luci-theme-argon.ipk https://github.com/jerrykuku/luci-theme-argon/releases/download/v2.3.2/luci-theme-argon_2.3.2-r20250207_all.ipk || curl -k -o luci-theme-argon.ipk https://github.com/jerrykuku/luci-theme-argon/releases/download/v2.3.2/luci-theme-argon_2.3.2-r20250207_all.ipk
+	opkg install luci-theme-argon*.ipk
+}
+main() {
+	if [ $(opkg list | grep -i glinjector | wc -l) = 1 ]; then
+		echo "glinjector already installed!!"
+	else
+		GlinjectorIns
+	fi
+	if [ $(opkg list | grep -i openclash | wc -l) = 1 ]; then
+		echo "openclash already installed!!"
+	else
+		OpClashInstall
+	fi
+	if [ $(opkg list | grep -i luci-theme-argon | wc -l) = 1 ]; then
+		echo "argontheme already installed!!"
+	else
+		ArgonInstall
+	fi
+	
 }
