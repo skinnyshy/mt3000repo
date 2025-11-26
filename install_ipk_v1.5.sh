@@ -88,34 +88,47 @@ EasytierIns() {
 
 }
 Cleanup() {
-    # 检查目录存在后删除，避免错误信息
-    [ -d /tmp/openclash ] && rm -rf /tmp/openclash
-    [ -d /tmp/glinjector ] && rm -rf /tmp/glinjector
-    [ -d /tmp/argon ] && rm -rf /tmp/argon
-    [ -d /tmp/easytier ] && rm -rf /tmp/easytier
+	read -p "是否要清空/tmp下的安装临时目录？(y or n)" ans
+	case "$ans" in 
+		y)
+			# 检查目录存在后删除，避免错误信息
+		    [ -d /tmp/openclash ] && rm -rf /tmp/openclash
+		    [ -d /tmp/glinjector ] && rm -rf /tmp/glinjector
+		    [ -d /tmp/argon ] && rm -rf /tmp/argon
+		    [ -d /tmp/easytier ] && rm -rf /tmp/easytier
+		    echo "安装临时目录已清理！"
+			;;
+		n)
+			echo "安装临时目录未清理，下次重启后自动清理！"
+			;;
+		*)
+			echo "输入不正确，请重新输入"
+			Cleanup
+			;;
+	esac
 }
 main() {
-	if [ $(opkg list-installed | grep -i glinjector | wc -l) -ge 1 ]; then
+	if [ $(opkg list-installed | grep -qi glinjector | wc -l) -ge 1 ]; then
 		echo "glinjector already installed!!"
 	else
 		GlinjectorIns
 	fi
-	if [ $(opkg list-installed | grep -i openclash | wc -l) -ge 1 ]; then
+	if [ $(opkg list-installed | grep -qi openclash | wc -l) -ge 1 ]; then
 		echo "openclash already installed!!"
 	else
 		OpClashInstall
 	fi
-	if [ $(opkg list-installed | grep -i luci-theme-argon | wc -l) -ge 1 ]; then
+	if [ $(opkg list-installed | grep -qi luci-theme-argon | wc -l) -ge 1 ]; then
 		echo "argontheme already installed!!"
 	else
 		ArgonInstall
 	fi
-	if [ $(opkg list-installed | grep -i app-store | wc -l) -ge 1 ]; then
+	if [ $(opkg list-installed | grep -qi app-store | wc -l) -ge 1 ]; then
 		echo "istore already installed!!"
 	else
 		IstoreInstall
 	fi
-	if [ $(opkg list-installed | grep -i easytier | wc -l) -ge 1 ]; then
+	if [ $(opkg list-installed | grep -qi easytier | wc -l) -ge 1 ]; then
 		echo "easytier already installed!!"
 	else
 		EasytierIns
