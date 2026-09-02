@@ -48,6 +48,9 @@ OpClashInstall() {
 	fi
 }
 
+DadeInstall() {
+	wget -O - https://gh-proxy.org/https://raw.githubusercontent.com/kenzok8/openwrt-daede/refs/heads/main/scripts/install.sh | ash
+}
 
 GlinjectorIns() {
 	mkdir -p /tmp/glinjector || exit 3
@@ -117,6 +120,11 @@ main() {
 		echo "openclash already installed!!"
 	else
 		OpClashInstall
+	fi
+	if [ $(opkg list-installed | grep -qi dade | wc -l) -ge 1 ]; then
+		echo "dade already installed!!"
+	else
+		DadeInstall
 	fi
 	if [ $(opkg list-installed | grep -qi luci-theme-argon | wc -l) -ge 1 ]; then
 		echo "argontheme already installed!!"
