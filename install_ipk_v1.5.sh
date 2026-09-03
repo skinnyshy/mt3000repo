@@ -69,7 +69,7 @@ ArgonInstall() {
 		}
 	mkdir -p /tmp/argon || exit 4
 	cd /tmp/argon || exit 4
-	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.3.2-r20250207_all.ipk
+	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk
 	opkg install luci-theme-argon*.ipk
 }
 
@@ -84,7 +84,7 @@ IstoreInstall() {
 EasytierIns() {
 	mkdir -p /tmp/easytier || exit 5
 	cd /tmp/easytier
-	wget --no-check-certificate -O easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip || curl -k -o easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.4.5-aarch64_cortex-a53-22.03.7.zip
+	wget --no-check-certificate -O easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.6.4-aarch64_cortex-a53-22.03.7.zip|| curl -k -o easytier.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/easytier/EasyTier-v2.6.4-aarch64_cortex-a53-22.03.7.zip
 	unzip easytier.zip
 	opkg_update_once
 	opkg install ./*.ipk || exit 5
