@@ -55,8 +55,8 @@ DadeInstall() {
 GlinjectorIns() {
 	mkdir -p /tmp/glinjector || exit 3
 	cd /tmp/glinjector || exit 3
-	wget --no-check-certificate  -O glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.5-6_all.zip || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.5-6_all.zip
-	unzip glinjector.zip || exit 3
+	wget --no-check-certificate  -O glinjector.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk
+	# unzip glinjector.zip || exit 3
 	opkg_update_once
 	opkg install *.ipk 
 }
@@ -70,7 +70,7 @@ ArgonInstall() {
 	mkdir -p /tmp/argon || exit 4
 	cd /tmp/argon || exit 4
 	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk
-	opkg install luci-theme-argon*.ipk
+	opkg install luci-app-argon*.ipk
 }
 
 IstoreInstall() {
