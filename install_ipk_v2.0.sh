@@ -10,6 +10,27 @@ opkg_update_once() {
     fi
 }
 
+is_installed() {
+	for pkg in "$@"; do
+		if opkg list-installed "$pkg" 2>/dev/null | grep -qi "^$pkg "; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+install_if_missing() {
+	name="$1"
+	install_func="$2"
+	shift 2
+
+	if is_installed "$@"; then
+		echo "$name already installed!!"
+	else
+		"$install_func"
+	fi
+}
+
 ChangeMirror(){
 	cp  /etc/opkg/distfeeds.conf  /etc/opkg/distfeeds.conf-$(date +%Y-%m-%d) || exit 1
 	cat> /etc/opkg/distfeeds.conf << EOF
@@ -36,7 +57,7 @@ OpClashInstall() {
 		    echo "错误: 依赖包安装失败"
 		    exit 2
 		}
-		opkg install /tmp/openclash.ipk
+		opkg install /tmp/openclash/openclash.ipk
 
 	else 
 		opkg_update_once
@@ -44,7 +65,7 @@ OpClashInstall() {
 		    echo "错误: 依赖包安装失败"
 		    exit 2
 		}
-		opkg install /tmp/openclash.ipk
+		opkg install /tmp/openclash/openclash.ipk
 	fi
 }
 
@@ -55,8 +76,7 @@ DadeInstall() {
 GlinjectorIns() {
 	mkdir -p /tmp/glinjector || exit 3
 	cd /tmp/glinjector || exit 3
-	wget --no-check-certificate  -O glinjector.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk || curl -k -o glinjector.zip https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk
-	# unzip glinjector.zip || exit 3
+	wget --no-check-certificate  -O glinjector.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk || curl -k -o glinjector.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/glinjector/glinjector_3.0.7-8_all.ipk
 	opkg_update_once
 	opkg install *.ipk 
 }
@@ -69,7 +89,7 @@ ArgonInstall() {
 		}
 	mkdir -p /tmp/argon || exit 4
 	cd /tmp/argon || exit 4
-	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk
+	wget --no-check-certificate -O luci-app-argon-config.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk || curl -k -o luci-app-argon-config.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-app-argon-config_2.4.7_all.ipk
 	wget --no-check-certificate -O luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.4.7_all.ipk || curl -k -o luci-theme-argon.ipk https://gh-proxy.org/https://github.com/skinnyshy/mt3000repo/raw/main/luci-argon-theme/luci-theme-argon_2.4.7_all.ipk
 	opkg install ./*.ipk
 }
@@ -112,38 +132,53 @@ Cleanup() {
 	esac
 }
 main() {
-	if [ $(opkg list-installed | grep -qi glinjector | wc -l) -ge 1 ]; then
-		echo "glinjector already installed!!"
-	else
-		GlinjectorIns
-	fi
-	if [ $(opkg list-installed | grep -qi openclash | wc -l) -ge 1 ]; then
-		echo "openclash already installed!!"
-	else
-		OpClashInstall
-	fi
-	if [ $(opkg list-installed | grep -qi dade | wc -l) -ge 1 ]; then
-		echo "dade already installed!!"
-	else
-		DadeInstall
-	fi
-	if [ $(opkg list-installed | grep -qi luci-theme-argon | wc -l) -ge 1 ]; then
-		echo "argontheme already installed!!"
-	else
-		ArgonInstall
-	fi
-	if [ $(opkg list-installed | grep -qi app-store | wc -l) -ge 1 ]; then
-		echo "istore already installed!!"
-	else
-		IstoreInstall
-	fi
-	if [ $(opkg list-installed | grep -qi easytier | wc -l) -ge 1 ]; then
-		echo "easytier already installed!!"
-	else
-		EasytierIns
-	fi	
-	Cleanup
-	
+	while true; do
+		echo "=============================="
+		echo "请选择要安装的软件："
+		echo "  1) OpenClash"
+		echo "  2) Glinjector"
+		echo "  3) daed"
+		echo "  4) Argon 主题"
+		echo "  5) iStore"
+		echo "  6) EasyTier"
+		echo "  0) 退出"
+		echo "=============================="
+		read -p "请输入数字后回车: " choice
+
+		case "$choice" in
+			1)
+				install_if_missing "openclash" OpClashInstall luci-app-openclash
+				Cleanup
+				;;
+			2)
+				install_if_missing "glinjector" GlinjectorIns glinjector
+				Cleanup
+				;;
+			3)
+				install_if_missing "daed" DadeInstall daed luci-app-daed
+				Cleanup
+				;;
+			4)
+				install_if_missing "argontheme" ArgonInstall luci-theme-argon luci-app-argon-config
+				Cleanup
+				;;
+			5)
+				install_if_missing "istore" IstoreInstall app-store luci-app-store
+				Cleanup
+				;;
+			6)
+				install_if_missing "easytier" EasytierIns easytier luci-app-easytier
+				Cleanup
+				;;
+			0)
+				echo "已退出。"
+				exit 0
+				;;
+			*)
+				echo "输入不正确，请输入 0-6。"
+				;;
+		esac
+	done
 }
 
 main
